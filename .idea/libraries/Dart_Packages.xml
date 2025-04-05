@@ -100,13 +100,6 @@
             </list>
           </value>
         </entry>
-        <entry key="marker">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../Marker/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="matcher">
           <value>
             <list>
@@ -228,7 +221,6 @@
       <root url="file://$USER_HOME$/Desktop/Flutter/flutter/bin/cache/pkg/sky_engine/lib" />
       <root url="file://$USER_HOME$/Desktop/Flutter/flutter/packages/flutter/lib" />
       <root url="file://$USER_HOME$/Desktop/Flutter/flutter/packages/flutter_test/lib" />
-      <root url="file://$PROJECT_DIR$/../Marker/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
