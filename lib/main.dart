@@ -20,6 +20,8 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -331,8 +333,90 @@ class ContactsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Контакты')),
-      body: Center(child: Text('Страница контактов')),
+      appBar: AppBar(
+        title: Text('Контакты', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red[400], // Match app bar color
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Контакты:',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Divider(
+              color: Colors.red[400],
+              thickness: 2.0, // Make the divider thicker
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Техническая поддержка:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            ContactItem(label: 'Телефон:', value: '+7(926)791-12-56'),
+            ContactItem(label: 'E-mail:', value: 'Mmatch@gmail.com'),
+            ContactItem(label: 'Telegram:', value: '@mmatchbot'),
+            ContactItem(label: 'VK:', value: 'M-Match Tech Service'),
+            SizedBox(height: 20),
+            Text(
+              'Обработка предложений:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            ContactItem(label: 'E-mail:', value: 'MmatchCS@gmail.com'),
+            ContactItem(label: 'Telegram:', value: '@mmatchCSbot'),
+            ContactItem(label: 'VK:', value: 'M-Match Cust, Suggest'),
+            SizedBox(height: 20), // Space for the image
+            Expanded( // Use Expanded so the image stays on the bottom
+              child: Center(
+                child: Container( // Placeholder for the image
+                  width: 200, // Adjust as needed
+                  height: 150, // Adjust as needed
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey), // Placeholder border
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Вставьте сюда картинку с самолетиком',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ContactItem extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const ContactItem({Key? key, required this.label, required this.value}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // Align text to the top
+        children: [
+          Text(
+            '$label ',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded( // Use Expanded to wrap the value
+            child: Text(value),
+          ),
+        ],
+      ),
     );
   }
 }
