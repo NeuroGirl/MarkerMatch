@@ -1,125 +1,431 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Login Screen',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: LoginPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class LoginPage extends StatelessWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'Вход',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100], // Light grey background
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Введите свой E-mail',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide.none, // Remove the border
+                        ),
+                        filled: true, // Set to true to fill the color
+                        fillColor: Colors.white, // White textfield background
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Введите пароль',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[400],
+                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        textStyle: TextStyle(fontSize: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Navigate to main screen (replace with your logic)
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      },
+                      child: const Text('Войти', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  // Navigate to registration screen (replace with your logic)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistrationPage()),
+                  );
+                },
+                child: const Text('Нет аккаунта? Зарегистрироваться', style: TextStyle(color: Colors.blue)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-  void _incrementCounter() {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  File? _image;
+  final picker = ImagePicker();
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleMenu() {
+    if (_animationController.isDismissed) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+  }
+
+  Future getImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        print('Image selected: ${_image!.path}');
+      } else {
+        print('No image selected.');
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        backgroundColor: Colors.red[400],
+        title: Text('Доброе утро!', style: TextStyle(color: Colors.white)),
+        leading: IconButton(
+          icon: Icon(Icons.menu, color: Colors.white),
+          onPressed: _toggleMenu,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help_outline, color: Colors.white),
+            onPressed: () {
+              // Handle help button press
+            },
+          ),
+
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: InkWell(
+                  onTap: getImage,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        style: BorderStyle.none,
+                      ),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 200,
+                      child: _image == null
+                          ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt_outlined, size: 50, color: Colors.grey),
+                          Text(
+                            'Вставьте свое фото с цветом для определения сюда',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      )
+                          : Image.file(
+                        _image!,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Divider(color: Colors.red[400]),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('История поиска', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 10),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.card_giftcard, size: 50, color: Colors.grey),
+                          Text(
+                            'К сожалению история пуста :(\nПроанализируйте свой первый цвет, и он будет сохранен сюда!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+    SlideTransition(
+    position: Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0)).animate(_animationController), // Перемещаем begin значение
+    child: ClipRect( // ClipRect, чтобы обрезать выезжающий элемент
+    child: Container(
+    width: screenWidth * 0.8, // Adjust width as needed
+    color: Colors.white, // Same background color as the screenshot
+    child: Padding(
+    padding: const EdgeInsets.only(top: 50.0), // Match padding
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    Align(
+    alignment: Alignment.topRight,
+    child: IconButton(
+    icon: Icon(Icons.close, color: Colors.red),
+    onPressed: _toggleMenu,
+    ),
+    ),
+    TextButton(
+    onPressed: () {
+    // Navigate to Settings
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()));
+    },
+    child: Text('Настройки', style: TextStyle(color: Colors.black, fontSize: 18)),
+    ),
+    TextButton(
+    onPressed: () {
+    // Navigate to Account
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage()));
+    },
+    child: Text('Аккаунт', style: TextStyle(color: Colors.black, fontSize: 18)),
+    ),
+    TextButton(
+    onPressed: () {
+    // Navigate to My List
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyListPage()));
+    },
+    child: Text('Мой список', style: TextStyle(color: Colors.black, fontSize: 18)),
+    ),
+    TextButton(
+    onPressed: () {
+    // Navigate to Contacts
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ContactsPage()));
+    },
+    child: Text('Контакты', style: TextStyle(color: Colors.black, fontSize: 18)),
+    ),
+                  ],
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          ),
+    ),
+      ],
+    ));
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Настройки')),
+      body: Center(child: Text('Страница настроек')),
+    );
+  }
+}
+
+class AccountPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Аккаунт')),
+      body: Center(child: Text('Страница аккаунта')),
+    );
+  }
+}
+
+class MyListPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Мой список')),
+      body: Center(child: Text('Страница "Мой список"')),
+    );
+  }
+}
+
+class ContactsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Контакты')),
+      body: Center(child: Text('Страница контактов')),
+    );
+  }
+}
+
+class RegistrationPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(  // Добавили "return"
+      backgroundColor: Colors.white,
+      body: Column( // Используем Column как родительский виджет
+        children: [
+      Center( // Center теперь внутри Column
+      child: Text(
+      'Регистрация',
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      ),
+    ),
+    Container( // Container теперь внутри Column
+    decoration: BoxDecoration(
+    color: Colors.grey[100],
+    borderRadius: BorderRadius.circular(20),
+    ),
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const SizedBox(height: 20), // SizedBox внутри children
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Введите свой E-mail',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Введите пароль',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Повторите пароль',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[400],
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                textStyle: const TextStyle(fontSize: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+              ),
+              onPressed: () {
+                // Navigate to main screen after registration (replace with your logic)
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              },
+              child: const Text('Зарегистрироваться', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    const SizedBox(height: 20),
+    TextButton(
+    onPressed: () {
+    // Navigate back to login screen
+    Navigator.pop(context);
+    },
+    child: const Text('Уже есть аккаунт? Войти', style: TextStyle(color: Colors.blue)),
+    ),
+  ]));
   }
 }
