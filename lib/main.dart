@@ -370,24 +370,6 @@ class ContactsPage extends StatelessWidget {
             ContactItem(label: 'Telegram:', value: '@mmatchCSbot'),
             ContactItem(label: 'VK:', value: 'M-Match Cust, Suggest'),
             SizedBox(height: 20), // Space for the image
-            Expanded( // Use Expanded so the image stays on the bottom
-              child: Center(
-                child: Container( // Placeholder for the image
-                  width: 200, // Adjust as needed
-                  height: 150, // Adjust as needed
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey), // Placeholder border
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Вставьте сюда картинку с самолетиком',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
