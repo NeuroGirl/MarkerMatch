@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,13 +16,28 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      home: const LoginPage(),
     );
   }
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +59,11 @@ class LoginPage extends StatelessWidget {
                   color: Colors.grey[100], // Light grey background
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     TextField(
+                      controller: _emailController, // Assign the controller
                       decoration: InputDecoration(
                         hintText: 'Введите свой E-mail',
                         border: OutlineInputBorder(
@@ -56,8 +74,9 @@ class LoginPage extends StatelessWidget {
                         fillColor: Colors.white, // White textfield background
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
+                      controller: _passwordController, // Assign the controller
                       obscureText: true,
                       decoration: InputDecoration(
                         hintText: 'Введите пароль',
@@ -73,18 +92,40 @@ class LoginPage extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[400],
-                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                        textStyle: TextStyle(fontSize: 18),
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        textStyle: const TextStyle(fontSize: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25.0),
                         ),
                       ),
                       onPressed: () {
-                        // Navigate to main screen (replace with your logic)
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                        );
+                        // Check if fields are empty
+                        if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+                          // Show an alert dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Ошибка'),
+                                content: const Text('Пожалуйста, заполните все поля.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('ОК'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          // Navigate to main screen (replace with your logic)
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          );
+                        }
                       },
                       child: const Text('Войти', style: TextStyle(color: Colors.white)),
                     ),
@@ -97,7 +138,7 @@ class LoginPage extends StatelessWidget {
                   // Navigate to registration screen (replace with your logic)
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegistrationPage()),
+                    MaterialPageRoute(builder: (context) => const RegistrationPage()),
                   );
                 },
                 child: const Text('Нет аккаунта? Зарегистрироваться', style: TextStyle(color: Colors.blue)),
@@ -111,6 +152,8 @@ class LoginPage extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -125,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
@@ -150,6 +193,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       if (pickedFile != null) {
         _image = File(pickedFile.path);
         print('Image selected: ${_image!.path}');
+        // Navigate to the new screen after image selection
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AnalysisScreen(image: _image),
+          ),
+        ).then((_) {  // Add this .then() block
+          setState(() {
+            _image = null; // Clear the image when returning
+          });
+        });
       } else {
         print('No image selected.');
       }
@@ -164,14 +218,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.red[400],
-        title: Text('Доброе утро!', style: TextStyle(color: Colors.white)),
+        title: const Text('Доброе утро!', style: TextStyle(color: Colors.white)),
         leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white),
+          icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: _toggleMenu,
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.help_outline, color: Colors.white),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
             onPressed: () {
               // Handle help button press
             },
@@ -198,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       width: double.infinity,
                       height: 200,
                       child: _image == null
-                          ? Column(
+                          ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.camera_alt_outlined, size: 50, color: Colors.grey),
@@ -218,8 +272,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
               Divider(color: Colors.red[400]),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
+              const Padding(
+                padding: EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -243,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ],
           ),
     SlideTransition(
-    position: Tween<Offset>(begin: Offset(-1, 0), end: Offset(0, 0)).animate(_animationController), // Перемещаем begin значение
+    position: Tween<Offset>(begin: const Offset(-1, 0), end: const Offset(0, 0)).animate(_animationController), // Перемещаем begin значение
     child: ClipRect( // ClipRect, чтобы обрезать выезжающий элемент
     child: Container(
     width: screenWidth * 0.8, // Adjust width as needed
@@ -256,37 +310,37 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     Align(
     alignment: Alignment.topRight,
     child: IconButton(
-    icon: Icon(Icons.close, color: Colors.red),
+    icon: const Icon(Icons.close, color: Colors.red),
     onPressed: _toggleMenu,
     ),
     ),
     TextButton(
     onPressed: () {
     // Navigate to Settings
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
     },
-    child: Text('Настройки', style: TextStyle(color: Colors.black, fontSize: 18)),
+    child: const Text('Настройки', style: TextStyle(color: Colors.black, fontSize: 18)),
     ),
     TextButton(
     onPressed: () {
     // Navigate to Account
-    Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountPage()));
     },
-    child: Text('Аккаунт', style: TextStyle(color: Colors.black, fontSize: 18)),
+    child: const Text('Аккаунт', style: TextStyle(color: Colors.black, fontSize: 18)),
     ),
     TextButton(
     onPressed: () {
     // Navigate to My List
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MyListPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const MyListPage()));
     },
-    child: Text('Мой список', style: TextStyle(color: Colors.black, fontSize: 18)),
+    child: const Text('Мой список', style: TextStyle(color: Colors.black, fontSize: 18)),
     ),
     TextButton(
     onPressed: () {
     // Navigate to Contacts
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ContactsPage()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactsPage()));
     },
-    child: Text('Контакты', style: TextStyle(color: Colors.black, fontSize: 18)),
+    child: const Text('Контакты', style: TextStyle(color: Colors.black, fontSize: 18)),
     ),
                   ],
                 ),
@@ -298,43 +352,213 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     ));
   }
 }
+// New screen for analysis
+class AnalysisScreen extends StatelessWidget {
+  final File? image;
 
-class SettingsPage extends StatelessWidget {
+  const AnalysisScreen({super.key, required this.image});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Настройки')),
-      body: Center(child: Text('Страница настроек')),
+      appBar: AppBar(
+        backgroundColor: Colors.red[400],
+        title: const Text('Анализ завершен!', style: TextStyle(color: Colors.white)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1.0,
+                  style: BorderStyle.none, // Changed to none for no border
+                ),
+                borderRadius: BorderRadius.circular(5.0), // Optional: Add rounded corners
+              ),
+              child: image != null
+                  ? Image.file(
+                image!,
+                fit: BoxFit.cover,
+                height: 200,
+              )
+                  : const SizedBox(
+                height: 200,
+                child: Center(
+                  child: Text('No image selected'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              color: Colors.red[400],
+              height: 2,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Найденные материалы:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1.0,
+                  style: BorderStyle.none,  // Changed to none for no border
+                ),
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: const Row(
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFC19A6B),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Маркер спиртовой:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('BR 116 Clay'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1.0,
+                  style: BorderStyle.none,  // Changed to none for no border
+                ),
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: const Row(
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFD4A017),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Краска акриловая:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('RAL 1024 Охра желтая'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Handle "Добавить в список" button press
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.red[400],
+                side: BorderSide(color: Colors.red[400]!),
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: const Text('Добавить в список'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[400],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                textStyle: const TextStyle(fontSize: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: const Text('Вернуться на главную'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Настройки')),
+      body: const Center(child: Text('Страница настроек')),
     );
   }
 }
 
 class AccountPage extends StatelessWidget {
+  const AccountPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Аккаунт')),
-      body: Center(child: Text('Страница аккаунта')),
+      appBar: AppBar(title: const Text('Аккаунт')),
+      body: const Center(child: Text('Страница аккаунта')),
     );
   }
 }
 
 class MyListPage extends StatelessWidget {
+  const MyListPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Мой список')),
-      body: Center(child: Text('Страница "Мой список"')),
+      appBar: AppBar(title: const Text('Мой список')),
+      body: const Center(child: Text('Страница "Мой список"')),
     );
   }
 }
 
 class ContactsPage extends StatelessWidget {
+  const ContactsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Контакты', style: TextStyle(color: Colors.white)),
+        title: const Text('Контакты', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red[400], // Match app bar color
       ),
       body: Padding(
@@ -342,7 +566,7 @@ class ContactsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Контакты:',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
@@ -350,26 +574,26 @@ class ContactsPage extends StatelessWidget {
               color: Colors.red[400],
               thickness: 2.0, // Make the divider thicker
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Техническая поддержка:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
-            ContactItem(label: 'Телефон:', value: '+7(926)791-12-56'),
-            ContactItem(label: 'E-mail:', value: 'Mmatch@gmail.com'),
-            ContactItem(label: 'Telegram:', value: '@mmatchbot'),
-            ContactItem(label: 'VK:', value: 'M-Match Tech Service'),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 10),
+            const ContactItem(label: 'Телефон:', value: '+7(926)791-12-56'),
+            const ContactItem(label: 'E-mail:', value: 'Mmatch@gmail.com'),
+            const ContactItem(label: 'Telegram:', value: '@mmatchbot'),
+            const ContactItem(label: 'VK:', value: 'M-Match Tech Service'),
+            const SizedBox(height: 20),
+            const Text(
               'Обработка предложений:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
-            ContactItem(label: 'E-mail:', value: 'MmatchCS@gmail.com'),
-            ContactItem(label: 'Telegram:', value: '@mmatchCSbot'),
-            ContactItem(label: 'VK:', value: 'M-Match Cust, Suggest'),
-            SizedBox(height: 20), // Space for the image
+            const SizedBox(height: 10),
+            const ContactItem(label: 'E-mail:', value: 'MmatchCS@gmail.com'),
+            const ContactItem(label: 'Telegram:', value: '@mmatchCSbot'),
+            const ContactItem(label: 'VK:', value: 'M-Match Cust, Suggest'),
+            const SizedBox(height: 20), // Space for the image
           ],
         ),
       ),
@@ -381,7 +605,7 @@ class ContactItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const ContactItem({Key? key, required this.label, required this.value}) : super(key: key);
+  const ContactItem({super.key, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +616,7 @@ class ContactItem extends StatelessWidget {
         children: [
           Text(
             '$label ',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Expanded( // Use Expanded to wrap the value
             child: Text(value),
@@ -404,13 +628,15 @@ class ContactItem extends StatelessWidget {
 }
 
 class RegistrationPage extends StatelessWidget {
+  const RegistrationPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(  // Добавили "return"
       backgroundColor: Colors.white,
       body: Column( // Используем Column как родительский виджет
         children: [
-      Center( // Center теперь внутри Column
+      const Center( // Center теперь внутри Column
       child: Text(
       'Регистрация',
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -421,7 +647,7 @@ class RegistrationPage extends StatelessWidget {
     color: Colors.grey[100],
     borderRadius: BorderRadius.circular(20),
     ),
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             const SizedBox(height: 20), // SizedBox внутри children
@@ -449,7 +675,7 @@ class RegistrationPage extends StatelessWidget {
                 fillColor: Colors.white,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               obscureText: true,
               decoration: InputDecoration(
@@ -476,7 +702,7 @@ class RegistrationPage extends StatelessWidget {
                 // Navigate to main screen after registration (replace with your logic)
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
                 );
               },
               child: const Text('Зарегистрироваться', style: TextStyle(color: Colors.white)),
