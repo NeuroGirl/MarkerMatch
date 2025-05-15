@@ -627,97 +627,161 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-class RegistrationPage extends StatelessWidget {
+class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
   @override
+  State<RegistrationPage> createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(  // Добавили "return"
-      backgroundColor: Colors.white,
-      body: Column( // Используем Column как родительский виджет
-        children: [
-      const Center( // Center теперь внутри Column
-      child: Text(
-      'Регистрация',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    ),
-    Container( // Container теперь внутри Column
-    decoration: BoxDecoration(
-    color: Colors.grey[100],
-    borderRadius: BorderRadius.circular(20),
-    ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const SizedBox(height: 20), // SizedBox внутри children
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Введите свой E-mail',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Введите пароль',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Повторите пароль',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[400],
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                textStyle: const TextStyle(fontSize: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0),
+    return Scaffold(
+        backgroundColor: Colors.white,
+        body: Column(
+            children: [
+              const Center(
+                child: Text(
+                  'Регистрация',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
-              onPressed: () {
-                // Navigate to main screen after registration (replace with your logic)
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                );
-              },
-              child: const Text('Зарегистрироваться', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    const SizedBox(height: 20),
-    TextButton(
-    onPressed: () {
-    // Navigate back to login screen
-    Navigator.pop(context);
-    },
-    child: const Text('Уже есть аккаунт? Войти', style: TextStyle(color: Colors.blue)),
-    ),
-  ]));
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        hintText: 'Введите свой E-mail',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Введите пароль',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Повторите пароль',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[400],
+                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        textStyle: const TextStyle(fontSize: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Check if any field is empty
+                        if (_emailController.text.isEmpty ||
+                            _passwordController.text.isEmpty ||
+                            _confirmPasswordController.text.isEmpty) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Ошибка'),
+                                content: const Text('Пожалуйста, заполните все поля.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('ОК'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          // Check if passwords match
+                        } else if (_passwordController.text != _confirmPasswordController.text) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Ошибка'),
+                                content: const Text('Пароли не совпадают.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('ОК'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                        else {
+                          // Navigate to main screen after registration (replace with your logic)
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          );
+                        }
+                      },
+                      child: const Text('Зарегистрироваться', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  // Navigate back to login screen
+                  Navigator.pop(context);
+                },
+                child: const Text('Уже есть аккаунт? Войти', style: TextStyle(color: Colors.blue)),
+              ),
+            ]));
   }
 }
+
