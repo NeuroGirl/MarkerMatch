@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
 void main() {
@@ -186,26 +190,159 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
 
+  // Color palette dictionary
+  static Map<Color, String> colorPalette = {
+    const Color.fromRGBO(255, 0, 0, 1.0): "Red",
+    const Color.fromRGBO(0, 255, 0, 1.0): "Green",
+    const Color.fromRGBO(0, 0, 255, 1.0): "Blue",
+    const Color.fromRGBO(255, 255, 0, 1.0): "Yellow",
+    const Color.fromRGBO(255, 0, 255, 1.0): "Magenta",
+    const Color.fromRGBO(0, 255, 255, 1.0): "Cyan",
+    const Color.fromRGBO(255, 255, 255, 1.0): "White",
+    const Color.fromRGBO(0, 0, 0, 1.0): "Black",
+    const Color.fromRGBO(192, 192, 192, 1.0): "Silver",
+    const Color.fromRGBO(128, 128, 128, 1.0): "Gray",
+    const Color.fromRGBO(128, 0, 0, 1.0): "Maroon",
+    const Color.fromRGBO(128, 128, 0, 1.0): "Olive",
+    const Color.fromRGBO(0, 128, 0, 1.0): "Dark Green",
+    const Color.fromRGBO(128, 0, 128, 1.0): "Purple",
+    const Color.fromRGBO(0, 128, 128, 1.0): "Teal",
+    const Color.fromRGBO(0, 0, 128, 1.0): "Navy",
+    const Color.fromRGBO(240, 128, 128, 1.0): "Light Coral",
+    const Color.fromRGBO(255, 160, 122, 1.0): "Light Salmon",
+    const Color.fromRGBO(255, 215, 0, 1.0): "Gold",
+    const Color.fromRGBO(255, 182, 193, 1.0): "Light Pink",
+    const Color.fromRGBO(160, 82, 45, 1.0): "Sienna",
+    const Color.fromRGBO(210, 105, 30, 1.0): "Chocolate",
+    // Add more colors as needed
+  };
+
+  static String getColorName(Color color) {
+    String closestColorName = "Unknown";
+    double smallestDistance = double.infinity;
+
+    colorPalette.forEach((paletteColor, colorName) {
+      final distance = colorDistance(color, paletteColor);
+      if (distance < smallestDistance) {
+        smallestDistance = distance;
+        closestColorName = colorName;
+      }
+    });
+
+    return closestColorName;
+  }
+
+  static double colorDistance(Color c1, Color c2) {
+    final r1 = c1.r;
+    final g1 = c1.g;
+    final b1 = c1.b;
+
+    final r2 = c2.r;
+    final g2 = c2.g;
+    final b2 = c2.b;
+
+    return sqrt(pow(r1 - r2, 2) + pow(g1 - g2, 2) + pow(b1 - b2, 2));
+  }
+
+  Future calculateAverageColorName(File imageFile) async {
+    try {
+      // Read the image file into memory
+      Uint8List bytes = await imageFile.readAsBytes();
+
+      // Decode the image using the image package
+      img.Image? image = img.decodeImage(bytes);
+
+      if (image == null) {
+        return "Unknown";
+      }
+
+      // Initialize variables to store the sum of RGB values
+      int redSum = 0;
+      int greenSum = 0;
+      int blueSum = 0;
+
+      // Iterate through each pixel in the image
+      for (int x = 0; x < image.width; x++) {
+        for (int y = 0; y < image.height; y++) {
+          // Get the pixel color
+          img.Color pixel = image.getPixel(x, y);
+
+          // Extract the RGB values
+          int red = pixel.r.toInt();
+          int green = pixel.g.toInt();
+          int blue = pixel.b.toInt();
+
+
+          // Add the RGB values to the sum
+          redSum += red;
+          greenSum += green;
+          blueSum += blue;
+        }
+      }
+
+      // Calculate the average RGB values
+      int numPixels = image.width * image.height;
+      double redAvg = redSum / numPixels;
+      double greenAvg = greenSum / numPixels;
+      double blueAvg = blueSum / numPixels;
+
+      // Create a Color object from the average RGB values
+      Color averageColor = Color.fromRGBO(redAvg.round(), greenAvg.round(), blueAvg.round(), 1.0);
+
+      // Find the closest color in the palette
+      return _HomeScreenState.getColorName(averageColor);
+
+    } catch (e) {
+      return "Unknown";
+    }
+  }
+
+
   Future getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        print('Image selected: ${_image!.path}');
-        // Navigate to the new screen after image selection
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AnalysisScreen(image: _image),
-          ),
-        ).then((_) {  // Add this .then() block
-          setState(() {
-            _image = null; // Clear the image when returning
+
+        // Calculate the average color
+        Future<dynamic> averageColorData = calculateAverageColorName(_image!);
+
+        averageColorData.then((averageColorResult) {
+
+          String averageColorName;
+          Color averageColor;
+
+          if(averageColorResult is String) {
+            averageColorName = averageColorResult;
+            averageColor = const Color.fromRGBO(0, 0, 0, 1.0); //Установите любой цвет по умолчанию
+            colorPalette.forEach((paletteColor, colorName) {
+              if (colorName == averageColorName) {
+                averageColor = paletteColor;
+              }
+            });
+          } else {
+            averageColorName = _HomeScreenState.getColorName(averageColorResult);
+            averageColor = averageColorResult;
+          }
+
+          // Navigate to the new screen after image selection
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AnalysisScreen(
+                image: _image,
+                averageColorName: averageColorName,
+                averageColor: averageColor, // Передаем averageColor
+              ),
+            ),
+          ).then((_) {
+            setState(() {
+              _image = null;
+            });
           });
         });
       } else {
-        print('No image selected.');
       }
     });
   }
@@ -352,12 +489,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     ));
   }
 }
-// New screen for analysis
+
 class AnalysisScreen extends StatelessWidget {
   final File? image;
+  final String? averageColorName;
+  final Color? averageColor; // Добавляем averageColor
 
-  const AnalysisScreen({super.key, required this.image});
-
+  const AnalysisScreen({super.key, required this.image, required this.averageColorName, this.averageColor});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -420,57 +558,23 @@ class AnalysisScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5.0),
               ),
               padding: const EdgeInsets.all(16.0),
-              child: const Row(
+              child: Row(
                 children: [
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFC19A6B),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
+                  SizedBox( //Remove it to disapear box
+                     width: 40,
+                     height: 40,
+                     child: DecoratedBox(
+                       decoration: BoxDecoration(
+                         color: averageColor ?? Colors.red,  // Use averageColor
+                       ),
+                     ),
+                   ),
+                  const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Маркер спиртовой:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('BR 116 Clay'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                border: Border.all(
-                  color: Colors.black,
-                  width: 1.0,
-                  style: BorderStyle.none,  // Changed to none for no border
-                ),
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: const Row(
-                children: [
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFD4A017),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Краска акриловая:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('RAL 1024 Охра желтая'),
+                      const Text('Маркер спиртовой:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(averageColorName ?? 'Unknown'), // Display color name
                     ],
                   ),
                 ],
