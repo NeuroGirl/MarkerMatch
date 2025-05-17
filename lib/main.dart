@@ -566,7 +566,7 @@ class AnalysisScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(),
                     spreadRadius: 1,
                     blurRadius: 5,
                     offset: const Offset(0, 3),
