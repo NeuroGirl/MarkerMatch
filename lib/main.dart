@@ -192,29 +192,28 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   // Color palette dictionary
   static Map<Color, String> colorPalette = {
-    const Color.fromRGBO(255, 0, 0, 1.0): "Red",
-    const Color.fromRGBO(0, 255, 0, 1.0): "Green",
-    const Color.fromRGBO(0, 0, 255, 1.0): "Blue",
-    const Color.fromRGBO(255, 255, 0, 1.0): "Yellow",
-    const Color.fromRGBO(255, 0, 255, 1.0): "Magenta",
-    const Color.fromRGBO(0, 255, 255, 1.0): "Cyan",
-    const Color.fromRGBO(255, 255, 255, 1.0): "White",
-    const Color.fromRGBO(0, 0, 0, 1.0): "Black",
-    const Color.fromRGBO(192, 192, 192, 1.0): "Silver",
-    const Color.fromRGBO(128, 128, 128, 1.0): "Gray",
-    const Color.fromRGBO(128, 0, 0, 1.0): "Maroon",
-    const Color.fromRGBO(128, 128, 0, 1.0): "Olive",
-    const Color.fromRGBO(0, 128, 0, 1.0): "Dark Green",
-    const Color.fromRGBO(128, 0, 128, 1.0): "Purple",
-    const Color.fromRGBO(0, 128, 128, 1.0): "Teal",
-    const Color.fromRGBO(0, 0, 128, 1.0): "Navy",
-    const Color.fromRGBO(240, 128, 128, 1.0): "Light Coral",
-    const Color.fromRGBO(255, 160, 122, 1.0): "Light Salmon",
-    const Color.fromRGBO(255, 215, 0, 1.0): "Gold",
-    const Color.fromRGBO(255, 182, 193, 1.0): "Light Pink",
-    const Color.fromRGBO(160, 82, 45, 1.0): "Sienna",
-    const Color.fromRGBO(210, 105, 30, 1.0): "Chocolate",
-    // Add more colors as needed
+    const Color.fromRGBO(133, 4, 111, 1.0): "P 82 - Light Violet",
+    const Color.fromRGBO(182, 227, 3, 1.0): "F 124 - Fluorescent Green",
+    const Color.fromRGBO(8, 126, 133, 1.0): "B 64 - Indian Blue",
+    const Color.fromRGBO(94, 19, 16, 1.0): "R 2 - Old Red",
+    const Color.fromRGBO(163, 74, 9, 1.0): "Br 95 - Burnt Sienna",
+    const Color.fromRGBO(242, 9, 9, 1.0): "R 13 - Scarlet",
+    const Color.fromRGBO(255, 255, 255, 1.0): "0 - Colorless Blender (No marker)",
+    const Color.fromRGBO(0, 0, 0, 1.0): "120 - Black",
+    const Color.fromRGBO(84, 43, 25, 1.0): "BR 98 - Chestnut Brown",
+    const Color.fromRGBO(222, 50, 4, 1.0): "R 22 - French Vermilion",
+    const Color.fromRGBO(245, 215, 16, 1.0): "Y 35 - Lemon Yellow",
+    const Color.fromRGBO(214, 0, 39, 1.0): "R 10 - Deep Red",
+    const Color.fromRGBO(86, 120, 117, 1.0): "BG5 - Blue Grey",
+    const Color.fromRGBO(48, 173, 121, 1.0): "G 58 - Mint Green Light",
+    const Color.fromRGBO(55, 25, 107, 1.0): "PB 71 - Cobalt Blue",
+    const Color.fromRGBO(66, 53, 29, 1.0): "Y 42 - Bronze Green",
+    const Color.fromRGBO(237, 139, 12, 1.0): "YR 24 - Marigold",
+    const Color.fromRGBO(92, 0, 105, 1.0): "PB 73 - Ultra Marine",
+    const Color.fromRGBO(2, 77, 44, 1.0): "BG 50 - Forest Green",
+    const Color.fromRGBO(52, 126, 163, 1.0): "PB 183 - Phthalo Blue",
+    const Color.fromRGBO(50, 171, 73, 1.0): "GY 59 - Pale Green",
+    const Color.fromRGBO(224, 143, 55, 1.0): "Y 36 - Cream",
   };
 
   static String getColorName(Color color) {
@@ -493,20 +492,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 class AnalysisScreen extends StatelessWidget {
   final File? image;
   final String? averageColorName;
-  final Color? averageColor; // Добавляем averageColor
+  final Color? averageColor;
 
-  const AnalysisScreen({super.key, required this.image, required this.averageColorName, this.averageColor});
+  const AnalysisScreen({Key? key, required this.image, required this.averageColorName, this.averageColor}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red[400],
-        title: const Text('Анализ завершен!', style: TextStyle(color: Colors.white)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Анализ завершен!',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -514,73 +514,103 @@ class AnalysisScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Image Container
             Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
-                  color: Colors.black,
+                  color: Colors.grey.shade300,
                   width: 1.0,
-                  style: BorderStyle.none, // Changed to none for no border
                 ),
-                borderRadius: BorderRadius.circular(5.0), // Optional: Add rounded corners
               ),
-              child: image != null
-                  ? Image.file(
-                image!,
-                fit: BoxFit.cover,
-                height: 200,
-              )
-                  : const SizedBox(
-                height: 200,
-                child: Center(
-                  child: Text('No image selected'),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: image != null
+                    ? Image.file(
+                  image!,
+                  fit: BoxFit.cover,
+                  height: 200,
+                )
+                    : const SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Text('No image selected'),
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
+
+            // Section Separator
             Container(
-              color: Colors.red[400],
               height: 2,
+              color: Colors.red[400],
+              margin: const EdgeInsets.symmetric(vertical: 10),
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Найденные материалы:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+            // Header for Found Materials
+            const Padding(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Text(
+                'Найденные материалы:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
             ),
             const SizedBox(height: 10),
+
+            // Result Container (Marker)
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[200],
-                border: Border.all(
-                  color: Colors.black,
-                  width: 1.0,
-                  style: BorderStyle.none,  // Changed to none for no border
-                ),
-                borderRadius: BorderRadius.circular(5.0),
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  SizedBox( //Remove it to disapear box
-                     width: 40,
-                     height: 40,
-                     child: DecoratedBox(
-                       decoration: BoxDecoration(
-                         color: averageColor ?? Colors.red,  // Use averageColor
-                       ),
-                     ),
-                   ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Маркер спиртовой:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(averageColorName ?? 'Unknown'), // Display color name
-                    ],
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: averageColor ?? Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(5.0),
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Маркер спиртовой:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          averageColorName ?? 'Unknown',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 20),
+
+            // Add to List Button
             ElevatedButton(
               onPressed: () {
                 // Handle "Добавить в список" button press
@@ -592,12 +622,16 @@ class AnalysisScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 textStyle: const TextStyle(fontSize: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                elevation: 2,
               ),
               child: const Text('Добавить в список'),
             ),
+
             const SizedBox(height: 10),
+
+            // Back to Main Button
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -608,8 +642,9 @@ class AnalysisScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 textStyle: const TextStyle(fontSize: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                elevation: 2,
               ),
               child: const Text('Вернуться на главную'),
             ),
